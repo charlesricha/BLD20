@@ -136,8 +136,14 @@ function Settings() {
         const text = await response.text();
         setSetupScript(text);
       } else {
-        const result = await response.json();
-        throw new Error(result.error || 'Failed to generate setup script');
+        let errorMsg = 'Failed to generate setup script';
+        try {
+          const result = await response.json();
+          errorMsg = result.error || errorMsg;
+        } catch (jsonErr) {
+          errorMsg = `Server error (${response.status}): ${response.statusText || 'Internal Server Error'}`;
+        }
+        throw new Error(errorMsg);
       }
     } catch (err) {
       console.error(err);
