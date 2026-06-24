@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if the requesting user is authenticated as an Admin
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.role == 'admin' || 
+        request.auth.token.email == 'admin@velocitywifi.net'
+      );
+    }
+
+    // Vouchers: Admin can query/read, writing/updating is restricted to Cloud Functions
+    match /vouchers/{code} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Sessions: Admin can query/read, writing/updating is restricted to Cloud Functions
+    match /sessions/{mac} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Payments: Admin can query/read, writing/updating is restricted to Cloud Functions
+    match /payments/{paymentId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Hotspots: Full access for Admin, restricted for clients
+    match /hotspots/{hotspotId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Packages: Public can read active packages, Admin can do CRUD operations
+    match /packages/{packageId} {
+      allow read: if isAdmin() || (resource != null && resource.data.active == true) || (resource == null);
+      allow write: if isAdmin();
+    }
+
+    // Auditing helper logs: Admin read only
+    match /failed_voucher_attempts/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    
+    match /disconnect_requests/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+  }
+}

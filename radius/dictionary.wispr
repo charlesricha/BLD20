@@ -1,0 +1,12 @@
+# WISPr Vendor-Specific Dictionary for RADIUS
+VENDOR		WISPr				14122
+
+BEGIN-VENDOR	WISPr
+ATTRIBUTE	WISPr-Location-ID			1	string
+ATTRIBUTE	WISPr-Location-Name			2	string
+ATTRIBUTE	WISPr-Logoff-URL			3	string
+ATTRIBUTE	WISPr-Redirection-URL			4	string
+ATTRIBUTE	WISPr-Bandwidth-Max-Up			7	integer
+ATTRIBUTE	WISPr-Bandwidth-Max-Down		8	integer
+ATTRIBUTE	WISPr-Session-Terminate-Time		9	string
+END-VENDOR	WISPr

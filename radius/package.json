@@ -1,0 +1,15 @@
+{
+  "name": "radius-server",
+  "version": "1.0.0",
+  "description": "Custom RADIUS Server for VelocityWiFi Billing System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "firebase-admin": "^11.8.0",
+    "radius": "^1.1.4"
+  },
+  "private": true
+}

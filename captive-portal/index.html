@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Speed WiFi Portal</title>
+    <!-- Preconnect to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="portal-container" id="app">
+        <!-- Floating Ambient Background elements (pure CSS, lightweight) -->
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+
+        <header class="portal-header">
+            <div class="logo-container">
+                <svg class="wifi-icon" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                    <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                    <line x1="12" y1="20" x2="12.01" y2="20" stroke-width="3"></line>
+                </svg>
+                <span class="logo-text">Velocity<span class="highlight">WiFi</span></span>
+            </div>
+            <p class="subtitle">Secure Self-Service Hotspot</p>
+        </header>
+
+        <main class="portal-content">
+            <!-- iOS Captive Portal Banner (if detected) -->
+            <div id="ios-warning" class="ios-alert hidden">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-text">
+                    <strong>iOS Connection Tip:</strong> If this window closes, open Safari and go to <strong>http://captive.apple.com</strong> to keep your session active.
+                </div>
+            </div>
+
+            <!-- View 1: Welcome & Landing -->
+            <section id="view-landing" class="view-panel active">
+                <div class="hero-section">
+                    <h1>Connect to Premium Internet</h1>
+                    <p>Choose a package or use a voucher to get online instantly.</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="btn-show-packages">
+                        <span>Buy Internet Package</span>
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <button class="btn btn-secondary" id="btn-show-voucher">
+                        <span>Redeem Voucher Code</span>
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 10h18M3 14h18"/></svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- View 2: Package Selection -->
+            <section id="view-packages" class="view-panel">
+                <div class="section-header">
+                    <button class="btn-back" id="btn-packages-back">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                    <h2>Select a Package</h2>
+                </div>
+                <div class="packages-grid" id="packages-container">
+                    <!-- Shimmer Loading State -->
+                    <div class="shimmer-card"></div>
+                    <div class="shimmer-card"></div>
+                    <div class="shimmer-card"></div>
+                </div>
+            </section>
+
+            <!-- View 3: Payment (M-Pesa STK Push) -->
+            <section id="view-payment" class="view-panel">
+                <div class="section-header">
+                    <button class="btn-back" id="btn-payment-back">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                    <h2>Payment details</h2>
+                </div>
+
+                <div class="payment-summary">
+                    <div class="summary-label">Selected Package</div>
+                    <div class="summary-value" id="summary-package-name">-</div>
+                    <div class="summary-price" id="summary-package-price">-</div>
+                </div>
+
+                <form id="payment-form" class="form-container">
+                    <div class="form-group">
+                        <label for="phone-number">M-Pesa Phone Number</label>
+                        <div class="input-wrapper">
+                            <span class="input-prefix">🇰🇪</span>
+                            <input type="tel" id="phone-number" placeholder="07XX XXX XXX or 254XX..." required pattern="^(07|01|254)([0-9]{8})$">
+                        </div>
+                        <span class="form-hint">Enter Safaricom number for M-Pesa STK Push</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="btn-pay-now">
+                        <span>Pay via M-Pesa</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- View 4: Payment Polling/Status -->
+            <section id="view-status" class="view-panel">
+                <div class="status-card">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                        <div class="spinner-ring"></div>
+                    </div>
+                    <h3 id="status-title">Sending STK Push...</h3>
+                    <p id="status-desc">Please check your phone for a PIN prompt to authorize payment.</p>
+                    
+                    <div class="polling-progress">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="status-progress"></div>
+                        </div>
+                        <div class="timer" id="status-timer">90s remaining</div>
+                    </div>
+
+                    <button class="btn btn-secondary btn-block hidden" id="btn-cancel-polling">
+                        Cancel & Go Back
+                    </button>
+                </div>
+            </section>
+
+            <!-- View 5: Voucher Redemption -->
+            <section id="view-voucher" class="view-panel">
+                <div class="section-header">
+                    <button class="btn-back" id="btn-voucher-back">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                    <h2>Enter Voucher</h2>
+                </div>
+
+                <form id="voucher-form" class="form-container">
+                    <div class="form-group">
+                        <label for="voucher-code">Voucher Code</label>
+                        <input type="text" id="voucher-code" class="voucher-input" placeholder="XXXX-XXXX-XXXX" required autocomplete="off" autocapitalize="characters">
+                        <span class="form-hint">Enter your 12-character voucher code</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="btn-redeem-voucher">
+                        <span>Connect Using Voucher</span>
+                    </button>
+                </form>
+            </section>
+
+            <!-- View 6: Success & Countdown Connected -->
+            <section id="view-connected" class="view-panel">
+                <div class="success-card">
+                    <div class="success-icon-wrapper">
+                        <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Connected Successfully!</h2>
+                    <p>You now have full high-speed internet access.</p>
+
+                    <div class="connection-stats">
+                        <div class="stat-box">
+                            <span class="stat-label">Time Remaining</span>
+                            <span class="stat-value" id="connected-time-remaining">--:--:--</span>
+                        </div>
+                    </div>
+
+                    <div class="connected-info">
+                        <p>Keep this window open or bookmarked to monitor your remaining time.</p>
+                        <div class="details-list">
+                            <div class="detail-item">
+                                <span class="d-label">MAC Address</span>
+                                <span class="d-value" id="connected-mac">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="d-label">IP Address</span>
+                                <span class="d-value" id="connected-ip">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" id="btn-browse">
+                        Start Browsing
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="portal-footer">
+            <p>&copy; 2026 VelocityWiFi. Powered by Cloud-RADIUS.</p>
+        </footer>
+    </div>
+
+    <!-- Error Toast Notification -->
+    <div id="toast" class="toast hidden">
+        <span id="toast-message">An error occurred</span>
+        <button id="toast-close">&times;</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
