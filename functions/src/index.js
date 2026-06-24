@@ -27,6 +27,14 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json());
 
+// Strip /api prefix from request URL if it exists (handles Vercel Serverless Function routing namespace)
+app.use((req, res, next) => {
+    if (req.url.startsWith('/api')) {
+        req.url = req.url.substring(4);
+    }
+    next();
+});
+
 // Register API Routes - Enclosed to handle lazy evaluation cleanly
 app.use('/payments', require('./payments'));
 app.use('/vouchers', require('./vouchers'));
