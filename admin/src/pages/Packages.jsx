@@ -14,8 +14,8 @@ function Packages() {
   const [formPrice, setFormPrice] = useState(0);
   const [formDuration, setFormDuration] = useState(1);
   const [formDataLimit, setFormDataLimit] = useState('');
-  const [formSpeedUp, setFormSpeedUp] = useState(1024); // default 1Mbps
-  const [formSpeedDown, setFormSpeedDown] = useState(2048); // default 2Mbps
+  const [formSpeedUp, setFormSpeedUp] = useState(1); // default 1 Mbps
+  const [formSpeedDown, setFormSpeedDown] = useState(2); // default 2 Mbps
   const [formActive, setFormActive] = useState(true);
 
   useEffect(() => {
@@ -41,8 +41,8 @@ function Packages() {
     setFormPrice(10);
     setFormDuration(1);
     setFormDataLimit('');
-    setFormSpeedUp(1024);
-    setFormSpeedDown(2048);
+    setFormSpeedUp(1);
+    setFormSpeedDown(2);
     setFormActive(true);
     setShowModal(true);
   };
@@ -53,8 +53,8 @@ function Packages() {
     setFormPrice(pkg.price_kes);
     setFormDuration(pkg.duration_hours);
     setFormDataLimit(pkg.data_limit_mb || '');
-    setFormSpeedUp(pkg.speed_up_kbps || '');
-    setFormSpeedDown(pkg.speed_down_kbps || '');
+    setFormSpeedUp(pkg.speed_up_kbps ? pkg.speed_up_kbps / 1024 : '');
+    setFormSpeedDown(pkg.speed_down_kbps ? pkg.speed_down_kbps / 1024 : '');
     setFormActive(pkg.active !== false);
     setShowModal(true);
   };
@@ -68,8 +68,8 @@ function Packages() {
       price_kes: Math.round(formPrice),
       duration_hours: Number(formDuration),
       data_limit_mb: formDataLimit ? Number(formDataLimit) : null,
-      speed_up_kbps: formSpeedUp ? Number(formSpeedUp) : null,
-      speed_down_kbps: formSpeedDown ? Number(formSpeedDown) : null,
+      speed_up_kbps: formSpeedUp ? Math.round(Number(formSpeedUp) * 1024) : null,
+      speed_down_kbps: formSpeedDown ? Math.round(Number(formSpeedDown) * 1024) : null,
       active: Boolean(formActive)
     };
 
@@ -232,19 +232,21 @@ function Packages() {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label>Upload Speed (Kbps)</label>
+                  <label>Upload Speed (Mbps)</label>
                   <input 
                     type="number" 
-                    placeholder="1024" 
+                    step="any"
+                    placeholder="e.g. 1" 
                     value={formSpeedUp} 
                     onChange={(e) => setFormSpeedUp(e.target.value === '' ? '' : Number(e.target.value))} 
                   />
                 </div>
                 <div className="form-group">
-                  <label>Download Speed (Kbps)</label>
+                  <label>Download Speed (Mbps)</label>
                   <input 
                     type="number" 
-                    placeholder="2048" 
+                    step="any"
+                    placeholder="e.g. 2" 
                     value={formSpeedDown} 
                     onChange={(e) => setFormSpeedDown(e.target.value === '' ? '' : Number(e.target.value))} 
                   />

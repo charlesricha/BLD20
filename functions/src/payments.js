@@ -11,11 +11,21 @@ async function getMpesaAccessToken() {
     const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
     const env = process.env.MPESA_ENV || 'sandbox';
     
+    console.log(`[Daraja Auth Debug] Env: ${env}`);
+    console.log(`[Daraja Auth Debug] Key length: ${consumerKey ? consumerKey.length : 0}, Secret length: ${consumerSecret ? consumerSecret.length : 0}`);
+    
+    if (consumerKey && consumerKey !== consumerKey.trim()) {
+        console.warn('[Daraja Auth Debug] WARNING: MPESA_CONSUMER_KEY has leading or trailing whitespace!');
+    }
+    if (consumerSecret && consumerSecret !== consumerSecret.trim()) {
+        console.warn('[Daraja Auth Debug] WARNING: MPESA_CONSUMER_SECRET has leading or trailing whitespace!');
+    }
+
     const baseUrl = env === 'production' 
         ? 'https://api.safaricom.co.ke' 
         : 'https://sandbox.safaricom.co.ke';
         
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
+    const auth = Buffer.from(`${(consumerKey || '').trim()}:${(consumerSecret || '').trim()}`).toString('base64');
     
     try {
         const response = await axios.get(`${baseUrl}/oauth/v1/generate?grant_type=client_credentials`, {
@@ -63,9 +73,9 @@ router.post('/initiate', async (req, res) => {
             ? 'https://api.safaricom.co.ke' 
             : 'https://sandbox.safaricom.co.ke';
             
-        const shortcode = process.env.MPESA_SHORTCODE;
-        const passkey = process.env.MPESA_PASSKEY;
-        const callbackUrl = process.env.MPESA_CALLBACK_URL;
+        const shortcode = (process.env.MPESA_SHORTCODE || '').trim();
+        const passkey = (process.env.MPESA_PASSKEY || '').trim();
+        const callbackUrl = (process.env.MPESA_CALLBACK_URL || '').trim();
         
         const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14); // YYYYMMDDHHMMSS
         const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
