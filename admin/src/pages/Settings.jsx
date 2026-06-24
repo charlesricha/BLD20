@@ -201,11 +201,22 @@ function Settings() {
                         <strong>{h.name}</strong>
                         <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{h.location || 'No location'}</div>
                       </td>
-                      <td style={{ fontFamily: 'monospace' }}>{h.mikrotik_ip}</td>
+                      <td style={{ fontFamily: 'monospace' }}>
+                        {h.mikrotik_ip}
+                        {h.last_ping_at && (
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'sans-serif', marginTop: '2px' }}>
+                            Last ping: {h.last_ping_at.toDate ? h.last_ping_at.toDate().toLocaleString() : new Date(h.last_ping_at).toLocaleString()}
+                          </div>
+                        )}
+                      </td>
                       <td>
-                        <span className={`badge ${h.active !== false ? 'badge-success' : 'badge-danger'}`}>
-                          {h.active !== false ? 'Active' : 'Inactive'}
-                        </span>
+                        {h.active === false ? (
+                          <span className="badge badge-danger">Disabled</span>
+                        ) : h.status === 'online' ? (
+                          <span className="badge badge-success">Online</span>
+                        ) : (
+                          <span className="badge badge-pending">Offline</span>
+                        )}
                       </td>
                       <td className="text-right" style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                         <button onClick={() => handleFetchScript(h.id)} className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }}>

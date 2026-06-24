@@ -147,6 +147,14 @@ add comment="BubbleNet Walled Garden" dst-host="fonts.gstatic.com"
     /ip firewall filter add action=accept chain=forward comment="BubbleNet Firewall" dst-port=67,68 protocol=udp
 }
 
+# ---------------------------------------------------------------------
+# 8. Check-in and Register Router with Cloud System
+# ---------------------------------------------------------------------
+# Makes an HTTP call to the Vercel API backend to verify the configuration
+# and register the router's current public IP address in the database.
+:log info "BubbleNet: Sending registration check-in to cloud..."
+/tool fetch url="${portalUrl}/api/mikrotik/register?hotspot_id=${hotspotId}" keep-result=no
+
 :log info "BubbleNet Setup Completed successfully!"
 # =====================================================================
 `;
@@ -158,6 +166,42 @@ add comment="BubbleNet Walled Garden" dst-host="fonts.gstatic.com"
     } catch (error) {
         console.error('Error generating RouterOS script:', error);
         return res.status(500).json({ success: false, error: 'Internal server error generating RouterOS script' });
+    }
+});
+
+// GET /api/mikrotik/register - Router check-in endpoint (Public, called by MikroTik /tool fetch)
+router.get('/register', async (req, res) => {
+    const hotspotId = req.query.hotspot_id;
+
+    if (!hotspotId) {
+        return res.status(400).json({ success: false, error: 'Missing hotspot_id' });
+    }
+
+    try {
+        const hotspotRef = db.collection('hotspots').doc(hotspotId);
+        const hotspotDoc = await hotspotRef.get();
+
+        if (!hotspotDoc.exists) {
+            return res.status(404).json({ success: false, error: 'Hotspot not found' });
+        }
+
+        // Resolve Router's public IP address from request headers or remote connection
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
+        // Extract first IP in list if forwarded by proxy
+        const publicIp = ip.split(',')[0].trim().replace('::ffff:', '');
+
+        await hotspotRef.update({
+            status: 'online',
+            mikrotik_ip: publicIp, // Auto-update public IP dynamically!
+            last_ping_at: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        console.log(`MikroTik Hotspot ${hotspotId} checked in successfully from IP: ${publicIp}`);
+        return res.json({ success: true, message: 'Router registered successfully' });
+
+    } catch (error) {
+        console.error('Error registering MikroTik:', error);
+        return res.status(500).json({ success: false, error: 'Internal server error registering router' });
     }
 });
 
