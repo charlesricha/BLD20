@@ -4,15 +4,43 @@ const express = require('express');
 const cors = require('cors');
 
 // Initialize Firebase Admin SDK
-if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+let serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+if (serviceAccountKey) {
     try {
-        const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
-        console.log('Firebase Admin initialized via FIREBASE_SERVICE_ACCOUNT_JSON environment variable.');
+        let credentials;
+        const trimmedKey = serviceAccountKey.trim();
+        
+        if (trimmedKey.startsWith('{')) {
+            // It's the raw JSON credentials string (used on Vercel)
+            credentials = JSON.parse(trimmedKey);
+            console.log('Firebase Admin initialized via service account JSON string.');
+        } else {
+            // It's a file path string (used locally or on VPS)
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Adjust path relative to functions directory if it's relative
+            const resolvedPath = path.isAbsolute(trimmedKey)
+                ? trimmedKey
+                : path.join(__dirname, '..', trimmedKey);
+                
+            if (fs.existsSync(resolvedPath)) {
+                credentials = require(resolvedPath);
+                console.log(`Firebase Admin initialized via service account file: ${resolvedPath}`);
+            } else {
+                console.warn(`Service account file not found at: ${resolvedPath}. Falling back to default initialization.`);
+            }
+        }
+        
+        if (credentials) {
+            admin.initializeApp({
+                credential: admin.credential.cert(credentials)
+            });
+        } else {
+            admin.initializeApp();
+        }
     } catch (error) {
-        console.error('Error parsing FIREBASE_SERVICE_ACCOUNT_JSON environment variable, falling back to default:', error);
+        console.error('Error initializing Firebase Admin SDK via service account configuration:', error);
         admin.initializeApp();
     }
 } else {
