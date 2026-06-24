@@ -36,12 +36,12 @@ router.get('/config/:hotspot_id', authenticateAdmin, async (req, res) => {
 
         // Create RouterOS commands
         const script = `# =====================================================================
-# VelocityWiFi MikroTik Hotspot One-Paste Setup Script
+# BubbleNet MikroTik Hotspot One-Paste Setup Script
 # Hotspot ID: ${hotspotId}
 # Generated: ${new Date().toLocaleString()}
 # =====================================================================
 
-:log info "Starting VelocityWiFi configuration script..."
+:log info "Starting BubbleNet configuration script..."
 
 # ---------------------------------------------------------------------
 # 1. DNS Settings
@@ -56,9 +56,9 @@ router.get('/config/:hotspot_id', authenticateAdmin, async (req, res) => {
 # Set up the RADIUS connection pointing to the cloud VPS server.
 # This authorizes the client requests and reports session bytes/accounting.
 /radius
-:local radiusFind [find comment="VelocityWiFi RADIUS"]
+:local radiusFind [find comment="BubbleNet RADIUS"]
 :if ($radiusFind != "") do={ remove $radiusFind }
-add comment="VelocityWiFi RADIUS" service=hotspot address=${radiusServerIp} secret="${radiusSecret}" authentication-port=1812 accounting-port=1813 timeout=3s
+add comment="BubbleNet RADIUS" service=hotspot address=${radiusServerIp} secret="${radiusSecret}" authentication-port=1812 accounting-port=1813 timeout=3s
 
 # Configure router to accept incoming CoA requests (disconnect sessions) from cloud
 /radius incoming set accept=yes port=3799
@@ -71,11 +71,11 @@ add comment="VelocityWiFi RADIUS" service=hotspot address=${radiusServerIp} secr
 /ip hotspot user profile
 set [find name=default] shared-users=1
 
-:local profileFind [/ip hotspot profile find name="velocity_profile"]
+:local profileFind [/ip hotspot profile find name="bubble_profile"]
 :if ($profileFind != "") do={
     /ip hotspot profile set $profileFind login-by=http-pap use-radius=yes radius-mac-format=xx:xx:xx:xx:xx:xx
 } else={
-    /ip hotspot profile add comment="VelocityWiFi Profile" name="velocity_profile" login-by=http-pap use-radius=yes radius-mac-format=xx:xx:xx:xx:xx:xx
+    /ip hotspot profile add comment="BubbleNet Profile" name="bubble_profile" login-by=http-pap use-radius=yes radius-mac-format=xx:xx:xx:xx:xx:xx
 }
 
 # ---------------------------------------------------------------------
@@ -83,30 +83,30 @@ set [find name=default] shared-users=1
 # ---------------------------------------------------------------------
 # Whitelist specific domains so unauthenticated clients can access the payment flows.
 /ip hotspot walled-garden
-remove [find comment="VelocityWiFi Walled Garden"]
-add comment="VelocityWiFi Walled Garden" dst-host="${portalDomain}"
-add comment="VelocityWiFi Walled Garden" dst-host="*.mpesa.safaricom.co.ke"
-add comment="VelocityWiFi Walled Garden" dst-host="*.safaricom.co.ke"
-add comment="VelocityWiFi Walled Garden" dst-host="fonts.googleapis.com"
-add comment="VelocityWiFi Walled Garden" dst-host="fonts.gstatic.com"
+remove [find comment="BubbleNet Walled Garden"]
+add comment="BubbleNet Walled Garden" dst-host="${portalDomain}"
+add comment="BubbleNet Walled Garden" dst-host="*.mpesa.safaricom.co.ke"
+add comment="BubbleNet Walled Garden" dst-host="*.safaricom.co.ke"
+add comment="BubbleNet Walled Garden" dst-host="fonts.googleapis.com"
+add comment="BubbleNet Walled Garden" dst-host="fonts.gstatic.com"
 
 # ---------------------------------------------------------------------
 # 5. Hotspot Server Setup
 # ---------------------------------------------------------------------
 # Check if there is already a hotspot server on the selected interface.
-# If so, link it to the velocity_profile. Otherwise, create a new one.
+# If so, link it to the bubble_profile. Otherwise, create a new one.
 :local serverFind [/ip hotspot find interface=${hotspotInterface}]
 :if ($serverFind != "") do={
-    :log info "VelocityWiFi: Found existing hotspot server on interface ${hotspotInterface}. Updating to use velocity_profile."
-    /ip hotspot set $serverFind profile=velocity_profile
+    :log info "BubbleNet: Found existing hotspot server on interface ${hotspotInterface}. Updating to use bubble_profile."
+    /ip hotspot set $serverFind profile=bubble_profile
 } else={
     :local firstServer [/ip hotspot find]
     :if ($firstServer != "") do={
-        :log info "VelocityWiFi: Hotspot server found on another interface. Setting profile to velocity_profile."
-        /ip hotspot set $firstServer profile=velocity_profile
+        :log info "BubbleNet: Hotspot server found on another interface. Setting profile to bubble_profile."
+        /ip hotspot set $firstServer profile=bubble_profile
     } else={
-        :log warning "VelocityWiFi: No existing hotspot server found. Creating server on interface ${hotspotInterface}. Make sure to run '/ip hotspot setup' first if routing/DHCP is not set up."
-        /ip hotspot add comment="VelocityWiFi Server" name="${hotspotName}" interface=${hotspotInterface} profile=velocity_profile disabled=no
+        :log warning "BubbleNet: No existing hotspot server found. Creating server on interface ${hotspotInterface}. Make sure to run '/ip hotspot setup' first if routing/DHCP is not set up."
+        /ip hotspot add comment="BubbleNet Server" name="${hotspotName}" interface=${hotspotInterface} profile=bubble_profile disabled=no
     }
 }
 
@@ -126,28 +126,28 @@ add comment="VelocityWiFi Walled Garden" dst-host="fonts.gstatic.com"
 
 :if ($loginPath != "") do={
     /file set [find name=$loginPath] contents="<html><head><meta http-equiv=\"refresh\" content=\"0; url=${portalUrl}?mac=\$(mac)&ip=\$(ip)&link-login=\$(link-login)&link-login-only=\$(link-login-only)&link-orig=\$(link-orig)&hotspot_id=${hotspotId}\" /></head></html>"
-    :log info "VelocityWiFi: Captive portal redirect written to $loginPath"
+    :log info "BubbleNet: Captive portal redirect written to $loginPath"
 } else={
-    :log error "VelocityWiFi Error: login.html not found! Please run the RouterOS '/ip hotspot setup' wizard first on interface ${hotspotInterface}."
+    :log error "BubbleNet Error: login.html not found! Please run the RouterOS '/ip hotspot setup' wizard first on interface ${hotspotInterface}."
 }
 
 # ---------------------------------------------------------------------
 # 7. Security Firewall Strategy
 # ---------------------------------------------------------------------
 # Restricts unauthenticated network access while permitting essential operations.
-/ip firewall filter remove [/ip firewall filter find comment="VelocityWiFi Firewall"]
+/ip firewall filter remove [/ip firewall filter find comment="BubbleNet Firewall"]
 :local firewallCount [:len [/ip firewall filter find]]
 :if ($firewallCount > 0) do={
-    /ip firewall filter add action=accept chain=forward comment="VelocityWiFi Firewall" connection-state=established,related place-before=0
-    /ip firewall filter add action=accept chain=forward comment="VelocityWiFi Firewall" dst-port=53 protocol=udp place-before=1
-    /ip firewall filter add action=accept chain=forward comment="VelocityWiFi Firewall" dst-port=67,68 protocol=udp place-before=2
+    /ip firewall filter add action=accept chain=forward comment="BubbleNet Firewall" connection-state=established,related place-before=0
+    /ip firewall filter add action=accept chain=forward comment="BubbleNet Firewall" dst-port=53 protocol=udp place-before=1
+    /ip firewall filter add action=accept chain=forward comment="BubbleNet Firewall" dst-port=67,68 protocol=udp place-before=2
 } else={
-    /ip firewall filter add action=accept chain=forward comment="VelocityWiFi Firewall" connection-state=established,related
-    /ip firewall filter add action=accept chain=forward comment="VelocityWiFi Firewall" dst-port=53 protocol=udp
-    /ip firewall filter add action=accept chain=forward comment="VelocityWiFi Firewall" dst-port=67,68 protocol=udp
+    /ip firewall filter add action=accept chain=forward comment="BubbleNet Firewall" connection-state=established,related
+    /ip firewall filter add action=accept chain=forward comment="BubbleNet Firewall" dst-port=53 protocol=udp
+    /ip firewall filter add action=accept chain=forward comment="BubbleNet Firewall" dst-port=67,68 protocol=udp
 }
 
-:log info "VelocityWiFi Setup Completed successfully!"
+:log info "BubbleNet Setup Completed successfully!"
 # =====================================================================
 `;
 

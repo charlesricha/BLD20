@@ -105,7 +105,7 @@ function App() {
               <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
               <line x1="12" y1="20" x2="12.01" y2="20" strokeWidth="3"></line>
             </svg>
-            <h2>VelocityWiFi</h2>
+            <h2>BubbleNet</h2>
             <p>Hotspot Control Panel Login</p>
           </div>
 
@@ -190,7 +190,7 @@ function Sidebar({ onLogout, userEmail }) {
           <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
           <line x1="12" y1="20" x2="12.01" y2="20" strokeWidth="3"></line>
         </svg>
-        <span>Velocity<span style={{ color: '#6366f1' }}>WiFi</span></span>
+        <span>Bubble<span style={{ color: '#6366f1' }}>Net</span></span>
       </div>
 
       <nav className="sidebar-menu">

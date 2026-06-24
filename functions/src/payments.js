@@ -86,7 +86,7 @@ router.post('/initiate', async (req, res) => {
             PartyB: shortcode,
             PhoneNumber: phone_number,
             CallBackURL: callbackUrl,
-            AccountReference: `Velocity_${mac_address.replace(/:/g, '')}`,
+            AccountReference: `Bubble_${mac_address.replace(/:/g, '')}`,
             TransactionDesc: `WiFi Package ${pkg.name}`
         }, {
             headers: {
