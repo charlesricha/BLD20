@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase';
+import { WifiOff } from 'lucide-react';
 
 function Sessions() {
   const [sessions, setSessions] = useState([]);
@@ -170,8 +171,9 @@ function Sessions() {
                           onClick={() => handleDisconnect(session.mac_address)} 
                           className="btn btn-danger btn-sm"
                           disabled={disconnectingId === session.mac_address}
+                          style={{ display: 'inline-flex', gap: '4px', alignItems: 'center' }}
                         >
-                          {disconnectingId === session.mac_address ? 'Disconnecting...' : '⛔ Kick Out'}
+                          {disconnectingId === session.mac_address ? 'Disconnecting...' : <><WifiOff size={12} /> Kick Out</>}
                         </button>
                       </td>
                     </tr>

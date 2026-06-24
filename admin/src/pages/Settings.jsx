@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
+import { Plus, FileText, Edit2, Trash2, Copy } from 'lucide-react';
 
 function Settings() {
   const [hotspots, setHotspots] = useState([]);
@@ -174,8 +175,8 @@ function Settings() {
           <h1>Hotspot Settings</h1>
           <p>Register Router gateways, manage credentials, and generate setup scripts.</p>
         </div>
-        <button onClick={openCreateModal} className="btn btn-primary">
-          <span>➕ Add Hotspot</span>
+        <button onClick={openCreateModal} className="btn btn-primary" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <Plus size={16} /> Add Hotspot
         </button>
       </div>
 
@@ -224,15 +225,15 @@ function Settings() {
                           <span className="badge badge-pending">Offline</span>
                         )}
                       </td>
-                      <td className="text-right" style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-                        <button onClick={() => handleFetchScript(h.id)} className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }}>
-                          📜 Script
+                      <td className="text-right" style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', alignItems: 'center' }}>
+                        <button onClick={() => handleFetchScript(h.id)} className="btn btn-secondary btn-sm" style={{ display: 'flex', gap: '4px', alignItems: 'center', padding: '4px 8px' }}>
+                          <FileText size={14} /> Script
                         </button>
-                        <button onClick={() => openEditModal(h)} className="btn btn-secondary btn-sm" style={{ padding: '4px 8px' }}>
-                          ✏️
+                        <button onClick={() => openEditModal(h)} className="btn btn-secondary btn-sm" style={{ display: 'flex', alignItems: 'center', padding: '6px' }}>
+                          <Edit2 size={12} />
                         </button>
-                        <button onClick={() => handleDelete(h.id)} className="btn btn-danger btn-sm" style={{ padding: '4px 8px' }}>
-                          🗑️
+                        <button onClick={() => handleDelete(h.id)} className="btn btn-danger btn-sm" style={{ display: 'flex', alignItems: 'center', padding: '6px' }}>
+                          <Trash2 size={12} />
                         </button>
                       </td>
                     </tr>
@@ -255,8 +256,8 @@ function Settings() {
               )}
             </div>
             {setupScript && (
-              <button onClick={handleCopyScript} className="btn btn-primary btn-sm">
-                📋 Copy Script
+              <button onClick={handleCopyScript} className="btn btn-primary btn-sm" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <Copy size={14} /> Copy Script
               </button>
             )}
           </div>
@@ -272,7 +273,7 @@ function Settings() {
               </pre>
             ) : (
               <p style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', marginTop: '70px' }}>
-                {selectedScriptId ? 'Generating Script...' : 'Select a hotspot using the "📜 Script" button to view RouterOS profile configuration code.'}
+                {selectedScriptId ? 'Generating Script...' : 'Select a hotspot using the "Script" button to view RouterOS profile configuration code.'}
               </p>
             )}
           </div>

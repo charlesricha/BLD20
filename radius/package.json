@@ -1,7 +1,7 @@
 {
   "name": "radius-server",
   "version": "1.0.0",
-  "description": "Custom RADIUS Server for VelocityWiFi Billing System",
+  "description": "Custom RADIUS Server for BubbleNet WiFi Billing System",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

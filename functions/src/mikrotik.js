@@ -19,10 +19,10 @@ router.get('/config/:hotspot_id', authenticateAdmin, async (req, res) => {
         
         // Configuration parameters from Env Variables and Hotspot Record
         const radiusServerIp = process.env.RADIUS_SERVER_IP || '12.34.56.78';
-        const portalUrl = process.env.PORTAL_URL || 'https://velocitywifi.web.app';
+        const portalUrl = process.env.PORTAL_URL || 'https://bubbleke.vercel.app';
         
         // Extract domain from portal URL for walled garden whitelisting
-        let portalDomain = 'velocitywifi.web.app';
+        let portalDomain = 'bubbleke.vercel.app';
         try {
             const urlObj = new URL(portalUrl);
             portalDomain = urlObj.hostname;
@@ -31,7 +31,7 @@ router.get('/config/:hotspot_id', authenticateAdmin, async (req, res) => {
         }
 
         const radiusSecret = hotspot.radius_secret || 'supersecretsharedkey';
-        const hotspotName = hotspot.name || 'velocity_hotspot';
+        const hotspotName = hotspot.name || 'bubble_hotspot';
         const hotspotInterface = hotspot.interface || 'bridge'; // e.g. bridge or ether2
 
         // Create RouterOS commands

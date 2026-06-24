@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, query, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase';
+import { Sparkles, Printer } from 'lucide-react';
 
 function Vouchers() {
   const [packages, setPackages] = useState([]);
@@ -158,9 +159,9 @@ function Vouchers() {
               type="submit" 
               className="btn btn-primary w-full"
               disabled={generating || packages.length === 0}
-              style={{ marginTop: '8px' }}
+              style={{ marginTop: '8px', display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}
             >
-              {generating ? 'Generating...' : '⚡ Generate Batch'}
+              {generating ? 'Generating...' : <><Sparkles size={16} /> Generate Batch</>}
             </button>
           </form>
         </div>
@@ -178,8 +179,8 @@ function Vouchers() {
                   <button onClick={() => setNewBatch(null)} className="btn btn-secondary btn-sm">
                     Clear View
                   </button>
-                  <button onClick={handlePrint} className="btn btn-primary btn-sm">
-                    🖨️ Print Vouchers
+                  <button onClick={handlePrint} className="btn btn-primary btn-sm" style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    <Printer size={14} /> Print Vouchers
                   </button>
                 </div>
               </div>
@@ -191,7 +192,7 @@ function Vouchers() {
                     {/* Add visual dash format for easier typing: XXXX-XXXX-XXXX */}
                     {code.replace(/(.{4})/g, '$1-').slice(0, -1)}
                     <div className="voucher-tag-price">
-                      VelocityWiFi | KES {newBatch.package.price_kes}
+                      BubbleNet | KES {newBatch.package.price_kes}
                     </div>
                   </div>
                 ))}

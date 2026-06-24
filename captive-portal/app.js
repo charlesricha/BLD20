@@ -1,5 +1,5 @@
 /**
- * VelocityWiFi Captive Portal Client Logic
+ * BubbleNet Captive Portal Client Logic
  */
 
 // Global Configuration / State

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
+import { Plus, Edit2, Trash2 } from 'lucide-react';
 
 function Packages() {
   const [packages, setPackages] = useState([]);
@@ -122,8 +123,8 @@ function Packages() {
           <h1>WiFi Packages</h1>
           <p>Define pricing, speed throttles, and transfer quotas.</p>
         </div>
-        <button onClick={openCreateModal} className="btn btn-primary">
-          <span>➕ Add Package</span>
+        <button onClick={openCreateModal} className="btn btn-primary" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <Plus size={16} /> Add Package
         </button>
       </div>
 
@@ -161,12 +162,12 @@ function Packages() {
                         {pkg.active !== false ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="text-right" style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-                      <button onClick={() => openEditModal(pkg)} className="btn btn-secondary btn-sm">
-                        ✏️ Edit
+                    <td className="text-right" style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', alignItems: 'center' }}>
+                      <button onClick={() => openEditModal(pkg)} className="btn btn-secondary btn-sm" style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                        <Edit2 size={12} /> Edit
                       </button>
-                      <button onClick={() => handleDelete(pkg.id)} className="btn btn-danger btn-sm">
-                        🗑️ Delete
+                      <button onClick={() => handleDelete(pkg.id)} className="btn btn-danger btn-sm" style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                        <Trash2 size={12} /> Delete
                       </button>
                     </td>
                   </tr>

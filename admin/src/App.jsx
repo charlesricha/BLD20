@@ -12,6 +12,18 @@ import Payments from './pages/Payments';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 
+// Import Icons
+import { 
+  LayoutDashboard, 
+  Wifi, 
+  Ticket, 
+  Users, 
+  CreditCard, 
+  TrendingUp, 
+  Settings as SettingsIcon, 
+  LogOut 
+} from 'lucide-react';
+
 function App() {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -58,7 +70,7 @@ function App() {
     setLoading(true);
     setAuthError('');
     try {
-      // In a real flow, checking if email matches admin@velocitywifi.net as a fail-safe helper
+      // In a real flow, checking if email matches admin@bubblenet.com as a fail-safe helper
       const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
       const idTokenResult = await userCredential.user.getIdTokenResult(true);
       
@@ -172,13 +184,13 @@ function Sidebar({ onLogout, userEmail }) {
   const path = location.pathname;
 
   const menuItems = [
-    { name: 'Dashboard', path: '/', icon: '📊' },
-    { name: 'WiFi Packages', path: '/packages', icon: '📶' },
-    { name: 'Vouchers Manager', path: '/vouchers', icon: '🎫' },
-    { name: 'Active Sessions', path: '/sessions', icon: '👥' },
-    { name: 'Payments Log', path: '/payments', icon: '💳' },
-    { name: 'Daily Reports', path: '/reports', icon: '📈' },
-    { name: 'Hotspot Settings', path: '/settings', icon: '⚙️' }
+    { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={18} /> },
+    { name: 'WiFi Packages', path: '/packages', icon: <Wifi size={18} /> },
+    { name: 'Vouchers Manager', path: '/vouchers', icon: <Ticket size={18} /> },
+    { name: 'Active Sessions', path: '/sessions', icon: <Users size={18} /> },
+    { name: 'Payments Log', path: '/payments', icon: <CreditCard size={18} /> },
+    { name: 'Daily Reports', path: '/reports', icon: <TrendingUp size={18} /> },
+    { name: 'Hotspot Settings', path: '/settings', icon: <SettingsIcon size={18} /> }
   ];
 
   return (
@@ -200,7 +212,7 @@ function Sidebar({ onLogout, userEmail }) {
             to={item.path}
             className={`menu-item ${path === item.path ? 'active' : ''}`}
           >
-            <span style={{ fontSize: '18px' }}>{item.icon}</span>
+            {item.icon}
             {item.name}
           </Link>
         ))}
@@ -211,8 +223,8 @@ function Sidebar({ onLogout, userEmail }) {
           Logged in as:<br />
           <span style={{ color: '#f9fafb' }}>{userEmail}</span>
         </div>
-        <button onClick={onLogout} className="btn btn-secondary btn-sm w-full">
-          🚪 Logout
+        <button onClick={onLogout} className="btn btn-secondary btn-sm w-full" style={{ display: 'flex', gap: '6px', alignItems: 'center', justifyContent: 'center' }}>
+          <LogOut size={14} /> Logout
         </button>
       </div>
     </aside>
