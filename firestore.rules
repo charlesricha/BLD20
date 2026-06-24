@@ -6,7 +6,7 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null && (
         request.auth.token.role == 'admin' || 
-        request.auth.token.email == 'admin@velocitywifi.net'
+        request.auth.token.email == 'admin@bubblenet.com'
       );
     }
 

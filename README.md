@@ -59,7 +59,7 @@ Copy `.env.example` to `.env` and configure:
    - **Firebase Hosting**: Activate hosting to publish both the portal and admin targets.
 
 3. **Generate Admin Custom Role Claim**:
-   - In the Firebase Console, register an admin email: `admin@velocitywifi.net`.
+   - In the Firebase Console, register an admin email: `admin@bubblenet.com`.
    - Assign the Custom Claim `role: "admin"` to the user profile via a Node.js helper or Firebase Functions Console to enable admin access.
 
 4. **Service Account Key**:

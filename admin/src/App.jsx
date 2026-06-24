@@ -29,7 +29,7 @@ function App() {
           const idTokenResult = await currentUser.getIdTokenResult(true);
           
           // Verify if user has the admin claim
-          if (idTokenResult.claims.role === 'admin' || currentUser.email === 'admin@velocitywifi.net') {
+          if (idTokenResult.claims.role === 'admin' || currentUser.email === 'admin@bubblenet.com') {
             setIsAdmin(true);
             setAuthError('');
           } else {
@@ -62,8 +62,8 @@ function App() {
       const userCredential = await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
       const idTokenResult = await userCredential.user.getIdTokenResult(true);
       
-      // If the email is admin@velocitywifi.net, bypass if claim is not written yet in sandbox
-      if (idTokenResult.claims.role === 'admin' || loginEmail === 'admin@velocitywifi.net') {
+      // If the email is admin@bubblenet.com, bypass if claim is not written yet in sandbox
+      if (idTokenResult.claims.role === 'admin' || loginEmail === 'admin@bubblenet.com') {
         setIsAdmin(true);
       } else {
         setAuthError('Access Denied. You do not have operator permissions.');
